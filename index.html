@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Chatroom</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+    #chatbox { width: 100%%; height: 300px; border: 1px solid #ccc; overflow-y: scroll; background: #fff; padding: 10px; }
+    input[type="text"] { width: 80%%; padding: 10px; }
+    input[type="submit"] { padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>AlphaWeb - chatroom</h2>
+  <div id="chatbox"></div>
+  <form id="chatForm">
+    <input type="text" id="message" autocomplete="off" placeholder="Type a message..." required />
+    <input type="submit" value="Send" />
+  </form>
+
+  <script>
+    let username = prompt("Enter your username:");
+
+    function fetchMessages() {
+      fetch("fetch.php")
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById("chatbox").innerHTML = data;
+          document.getElementById("chatbox").scrollTop = document.getElementById("chatbox").scrollHeight;
+        });
+    }
+
+    document.getElementById("chatForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const message = document.getElementById("message").value;
+      fetch("post.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "message=" + encodeURIComponent(username + ": " + message)
+      }).then(() => {
+        document.getElementById("message").value = "";
+        fetchMessages();
+      });
+    });
+
+    setInterval(fetchMessages, 1000);
+    fetchMessages();
+  </script>
+</body>
+</html>
